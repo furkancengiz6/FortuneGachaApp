@@ -1,0 +1,32 @@
+# .NET Core
+bin/
+obj/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React Native / Expo
+.expo/
+dist/
+build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Environment
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.user
