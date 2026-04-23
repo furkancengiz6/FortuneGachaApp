@@ -31,41 +31,44 @@ public class AuthController : ControllerBase
             return BadRequest("Username or Email already exists.");
         }
 
-        var user = new User
+        var profile = new GachaProfile
         {
             Username = request.Username,
             Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
         };
 
-        _context.Users.Add(user);
+        _context.Users.Add(profile);
         await _context.SaveChangesAsync();
 
-        var token = _authService.GenerateToken(user);
-        return Ok(new AuthResponse(token, user.Username, user.Email));
+        var token = _authService.GenerateToken(profile);
+        return Ok(new AuthResponse(token, profile.Username, profile.Email));
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == request.Username);
+        var profile = await _context.Users.SingleOrDefaultAsync(u => u.Username == request.Username);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        if (profile == null || !BCrypt.Net.BCrypt.Verify(request.Password, profile.PasswordHash))
         {
             return Unauthorized("Invalid credentials.");
         }
 
-        var token = _authService.GenerateToken(user);
-        return Ok(new AuthResponse(token, user.Username, user.Email));
+        var token = _authService.GenerateToken(profile);
+        return Ok(new AuthResponse(token, profile.Username, profile.Email));
     }
 
     [HttpGet("me")]
     [Authorize]
     public async Task<IActionResult> GetCurrentUser()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var user = await _context.Users.FindAsync(userId);
-        if (user == null) return NotFound();
+        var idClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(idClaim)) return Unauthorized();
+
+        var userId = int.Parse(idClaim);
+        var profile = await _context.Users.FindAsync(userId);
+        if (profile == null) return NotFound();
 
         var activeDecorations = await _context.UserDecorations
             .Include(ud => ud.Decoration)
@@ -75,12 +78,35 @@ public class AuthController : ControllerBase
 
         return Ok(new 
         { 
-            user.Id, 
-            user.Username, 
-            user.Email, 
-            user.GachaPoints,
-            user.LastDrawDate,
+            profile.Id, 
+            profile.Username, 
+            profile.Email, 
+            profile.GachaPoints,
+            profile.LastDrawDate,
+            profile.ZodiacSign,
+            profile.PersonalInterests,
+            profile.Bio,
             Equipped = activeDecorations
         });
+    }
+
+    [HttpPut("update")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        var idClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(idClaim)) return Unauthorized();
+
+        var userId = int.Parse(idClaim);
+        var profile = await _context.Users.FindAsync(userId);
+        if (profile == null) return NotFound();
+
+        profile.ZodiacSign = request.ZodiacSign;
+        profile.PersonalInterests = request.PersonalInterests;
+        profile.Bio = request.Bio;
+        profile.BirthDate = request.BirthDate;
+
+        await _context.SaveChangesAsync();
+        return Ok(profile);
     }
 }

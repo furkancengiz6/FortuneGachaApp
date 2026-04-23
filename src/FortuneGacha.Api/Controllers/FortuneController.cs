@@ -18,51 +18,63 @@ public class FortuneController : ControllerBase
     private readonly GachaDbContext _context;
     private readonly IGachaService _gachaService;
     private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly IQuestService _questService;
 
-    public FortuneController(GachaDbContext context, IGachaService gachaService, IHubContext<NotificationHub> hubContext)
+    public FortuneController(GachaDbContext context, IGachaService gachaService, IHubContext<NotificationHub> hubContext, IQuestService questService)
     {
         _context = context;
         _gachaService = gachaService;
         _hubContext = hubContext;
+        _questService = questService;
     }
 
     [HttpPost("draw")]
-    public async Task<IActionResult> Draw([FromQuery] bool boost = false)
+    public async Task<IActionResult> Draw(bool boost = false)
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userIdString == null) return Unauthorized();
-        var userId = int.Parse(userIdString);
+        var uid = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(uid)) return Unauthorized();
+        
+        var userId = int.Parse(uid);
+        var activeUser = await _context.Users.FindAsync(userId);
+        if (activeUser == null) return NotFound();
 
-        var user = await _context.Users.FindAsync(userId);
-        if (user == null) return Unauthorized();
-
-        if (user.LastDrawDate.HasValue && user.LastDrawDate.Value.Date == DateTime.UtcNow.Date)
+        if (activeUser.LastDrawDate.HasValue && activeUser.LastDrawDate.Value.Date == DateTime.Today)
         {
-            return BadRequest("Günde sadece bir kez fal çekebilirsin. Yarın tekrar gel!");
+            return BadRequest("Günde sadece bir kez fal çekebilirsin.");
         }
 
-        if (boost)
+        bool isBirthday = activeUser.BirthDate.HasValue && 
+                         activeUser.BirthDate.Value.Month == DateTime.UtcNow.Month && 
+                         activeUser.BirthDate.Value.Day == DateTime.UtcNow.Day;
+
+        if (boost && !isBirthday)
         {
-            if (user.GachaPoints < 100) return BadRequest("Luck Boost için yetersiz Gacha Puanı (100 GP gerekir).");
-            user.GachaPoints -= 100;
+            if (activeUser.GachaPoints < 100) return BadRequest("Yetersiz GP.");
+            activeUser.GachaPoints -= 100;
         }
 
-        var result = await _gachaService.GenerateFortuneAsync(boost);
+        var result = await _gachaService.GenerateFortuneAsync(activeUser, boost || isBirthday);
+        
+        if (isBirthday) activeUser.GachaPoints += 500;
 
         var dailyFortune = new DailyFortune
         {
             UserId = userId,
+            Profile = activeUser, // Explicitly link to the tracked user object
             FortuneText = result.FortuneText,
             ImageUrl = result.ImageUrl,
             Rarity = result.Rarity,
+            DailyCommentary = result.DailyCommentary,
             DrawDate = DateTime.UtcNow
         };
 
-        user.LastDrawDate = DateTime.UtcNow;
+        activeUser.LastDrawDate = DateTime.UtcNow;
         _context.DailyFortunes.Add(dailyFortune);
         
-        await CheckAchievementsAsync(user, result.Rarity);
+        await CheckAchievementsAsync(activeUser, result.Rarity);
         await _context.SaveChangesAsync();
+
+        await _questService.UpdateProgressAsync(userId, "Draw");
 
         return Ok(new 
         {
@@ -70,44 +82,47 @@ public class FortuneController : ControllerBase
             dailyFortune.FortuneText,
             dailyFortune.ImageUrl,
             dailyFortune.Rarity,
-            user.GachaPoints
+            dailyFortune.DailyCommentary,
+            activeUser.GachaPoints
         });
     }
 
-    private async Task CheckAchievementsAsync(User user, string lastRarity)
+    private async Task CheckAchievementsAsync(GachaProfile profile, string rarity)
     {
-        if (!await _context.UserAchievements.AnyAsync(ua => ua.UserId == user.Id && ua.AchievementId == 1))
+        if (!await _context.UserAchievements.AnyAsync(ua => ua.UserId == profile.Id && ua.AchievementId == 1))
         {
-            await GrantAchievement(user, 1);
+            await GrantAchievement(profile, 1);
         }
 
-        if (lastRarity == "Legendary" && !await _context.UserAchievements.AnyAsync(ua => ua.UserId == user.Id && ua.AchievementId == 2))
+        if (rarity == "Legendary" && !await _context.UserAchievements.AnyAsync(ua => ua.UserId == profile.Id && ua.AchievementId == 2))
         {
-            await GrantAchievement(user, 2);
+            await GrantAchievement(profile, 2);
         }
 
-        var fortuneCount = await _context.DailyFortunes.CountAsync(f => f.UserId == user.Id);
-        if (fortuneCount >= 10 && !await _context.UserAchievements.AnyAsync(ua => ua.UserId == user.Id && ua.AchievementId == 4))
+        var count = await _context.DailyFortunes.CountAsync(f => f.UserId == profile.Id);
+        if (count >= 10 && !await _context.UserAchievements.AnyAsync(ua => ua.UserId == profile.Id && ua.AchievementId == 4))
         {
-            await GrantAchievement(user, 4);
+            await GrantAchievement(profile, 4);
         }
     }
 
-    private async Task GrantAchievement(User user, int achievementId)
+    private async Task GrantAchievement(GachaProfile profile, int achievementId)
     {
         var achievement = await _context.Achievements.FindAsync(achievementId);
         if (achievement == null) return;
 
         _context.UserAchievements.Add(new UserAchievement
         {
-            UserId = user.Id,
+            UserId = profile.Id,
+            Profile = profile,
             AchievementId = achievementId,
+            Achievement = achievement,
             EarnedDate = DateTime.UtcNow
         });
 
-        user.GachaPoints += achievement.GpReward;
+        profile.GachaPoints += achievement.GpReward;
 
-        await _hubContext.Clients.User(user.Id.ToString()).SendAsync("ReceiveNotification", new 
+        await _hubContext.Clients.User(profile.Id.ToString()).SendAsync("ReceiveNotification", new 
         { 
             title = "Yeni Başarım!", 
             message = $"'{achievement.Name}' madalyasını kazandın! +{achievement.GpReward} GP" 
@@ -118,24 +133,25 @@ public class FortuneController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetShowcase(string username)
     {
-        var user = await _context.Users
-            .Include(u => u.DailyFortunes.OrderByDescending(f => f.DrawDate))
+        var target = await _context.Users
+            .Include(u => u.MyDailyFortunes)
             .ThenInclude(f => f.Likes)
             .FirstOrDefaultAsync(u => u.Username == username);
 
-        if (user == null) return NotFound("User not found.");
+        if (target == null) return NotFound("User not found.");
 
-        var showcase = user.DailyFortunes
+        var showcase = target.MyDailyFortunes
             .Where(f => f.IsPublic)
-            .Select(f => new
-            {
-                f.Id,
-                f.FortuneText,
-                f.ImageUrl,
-                f.Rarity,
-                f.DrawDate,
-                LikeCount = f.Likes.Count
-            });
+            .OrderByDescending(f => f.DrawDate)
+            .Select(f => new { 
+                    f.Id, 
+                    f.FortuneText, 
+                    f.ImageUrl, 
+                    f.Rarity, 
+                    f.DailyCommentary,
+                    f.DrawDate, 
+                    Likes = f.Likes.Count 
+                });
 
         return Ok(showcase);
     }
@@ -143,15 +159,42 @@ public class FortuneController : ControllerBase
     [HttpGet("my-fortunes")]
     public async Task<IActionResult> GetMyFortunes()
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userIdString == null) return Unauthorized();
-        var userId = int.Parse(userIdString);
+        var uid = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(uid)) return Unauthorized();
+        
+        var userId = int.Parse(uid);
 
-        var fortunes = await _context.DailyFortunes
+        var list = await _context.DailyFortunes
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.DrawDate)
             .ToListAsync();
 
-        return Ok(fortunes);
+        return Ok(list);
+    }
+
+    [HttpGet("analysis")]
+    public async Task<IActionResult> GetWeeklyAnalysis()
+    {
+        var uidClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (uidClaim == null) return Unauthorized();
+        var userId = int.Parse(uidClaim);
+
+        var activeUser = await _context.Users.FindAsync(userId);
+        if (activeUser == null) return NotFound();
+
+        var recentFortunes = await _context.DailyFortunes
+            .Where(f => f.UserId == userId)
+            .OrderByDescending(f => f.DrawDate)
+            .Take(7)
+            .ToListAsync();
+
+        if (recentFortunes.Count < 3)
+        {
+            return BadRequest("Haftalık analiz için en az 3 adet falın olmalı. Makaraları çevirmeye devam et!");
+        }
+
+        var analysis = await _gachaService.GenerateWeeklyAnalysisAsync(activeUser, recentFortunes);
+
+        return Ok(new { Analysis = analysis });
     }
 }

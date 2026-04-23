@@ -30,7 +30,7 @@ public class MarketplaceController : ControllerBase
     public async Task<IActionResult> GetItems([FromQuery] string? rarity = null)
     {
         var query = _context.DailyFortunes
-            .Include(f => f.User)
+            .Include(f => f.Profile)
             .Where(f => f.IsForSale);
 
         if (!string.IsNullOrEmpty(rarity))
@@ -47,7 +47,7 @@ public class MarketplaceController : ControllerBase
                 f.ImageUrl,
                 f.Rarity,
                 f.Price,
-                Seller = f.User.Username
+                Seller = f.Profile.Username
             })
             .ToListAsync();
 
@@ -81,7 +81,7 @@ public class MarketplaceController : ControllerBase
         try
         {
             var fortune = await _context.DailyFortunes
-                .Include(f => f.User)
+                .Include(f => f.Profile)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
             if (fortune == null || !fortune.IsForSale || fortune.Price == null)
@@ -91,7 +91,7 @@ public class MarketplaceController : ControllerBase
                 return BadRequest("Kendi falını satın alamazsın.");
 
             var buyer = await _context.Users.FindAsync(buyerId);
-            var seller = fortune.User;
+            var seller = fortune.Profile;
 
             if (buyer == null || buyer.GachaPoints < fortune.Price.Value)
                 return BadRequest("Yetersiz Gacha Puanı.");

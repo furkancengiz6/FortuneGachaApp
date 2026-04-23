@@ -1,80 +1,213 @@
 # 🔮 Fortune Gacha App
 
-Fortune Gacha, günlük asistanlık, oyunlaştırma ve yapay zekayı birleştiren mistik, modern sosyal bir mobil uygulamadır.
-
-Her gün sadece bir kez, kendi falınızı çekebilir ("Gacha" mekaniği ile), şansınıza düşen nadirliğe (Common, Uncommon, Rare, Legendary) göre benzersiz görsellerle desteklenmiş fallar elde ederseniz. Özellikle üst seviye (Rare ve Legendary) kartlar OpenAI (DALL-E 3 ve GPT-4o) güvencesiyle tamamen size özel olarak, o günkü kişisel titreşiminize göre üretilir.
+Fortune Gacha; günlük fal, Türk kahvesi falı, oyunlaştırma ve yapay zekayı birleştiren mistik, modern ve sosyal bir mobil uygulamadır. Kullanıcılar günlük fallarını "Gacha" slot makinesi mekaniğiyle çeker, fincan fotoğraflarıyla kahve falı baktırır ve bu falları koleksiyonlar, arkadaşlarıyla paylaşır.
 
 ---
 
-## 📸 Ekran Görüntüleri & Gacha Çıktıları
+## 🌟 Özellikler
 
-### Standart Fallar (Common)
-<img src="docs/assets/common_fortune_1_1775047137594.png" width="250" />
-<img src="docs/assets/common_fortune_2_1775047173578.png" width="250" />
+### 🎰 Gacha Slot Makinesi
+- **Slot Çarkı**: Makaralı slot makinesi animasyonuyla günlük fal çekimi.
+- **Nadir Kart Sistemi**: Common, Uncommon, Rare ve Legendary kart koleksiyonu.
+- **Luck Boost**: 100 GP karşılığında Legendary kart şansını %15'e çıkar.
+- **Haptic Feedback**: Çekimlerde titreşim geri bildirimi ile gerçekçi deneyim.
 
-### Nadir Fallar (Uncommon / Rare / Legendary)
-<img src="docs/assets/uncommon_fortune_1_1775047157687.png" width="250" />
+### ☕ Türk Kahvesi Falı
+- **Kamera Entegrasyonu**: Fincanın fotoğrafını çek veya galeriden seç.
+- **GPT-4 Vision Analizi**: Yapay zeka fincandaki desenleri, figürleri ve şekilleri analiz eder.
+- **Kişisel Yorum**: Fincandaki desenlere dayalı 3-5 cümlelik mistik ve samimi yorum.
+- **DALL-E Kart Oluşturma**: AI yoruma göre sanatsal, dikey bir kart görseli üretir.
+- **Günlük Limit**: 1 ücretsiz okuma, ek okumalar 50 GP.
+- **Geçmiş Fallar**: Tüm kahve falı geçmişin kaydedilir ve geri görüntülenebilir.
 
-*(Görseller temsilidir. Rare ve Legendary fallar çalışma zamanında DALL-E 3 aracılığıyla özel oluşturulur.)*
+### 🎭 Kişiselleştirilmiş AI Falları
+- **GPT-4o Desteği**: Burcun, ilgi alanların ve biyografine göre sana özel üretilen mistik mesajlar.
+- **DALL-E 3 Görselleri**: "Rare" ve "Legendary" kartlar için o ana özel üretilen eşsiz sanat eserleri.
+- **Mock Test Modu**: OpenAI API olmadan rastgele fal ve yorum üretimi ile test imkânı.
+
+### 🏪 Pazar Yeri & Mağaza
+- **Dinamik Market**: Diğer kullanıcıların paylaştığı falları nadirlik filtreleriyle incele.
+- **Kişiselleştirme Dükkanı**: Kazandığın GP'lerle profilin için şık **Avatar Çerçeveleri** satın al.
+
+### 🤝 Sosyal & Hediyeleşme
+- **Arkadaşlık Sistemi**: Kullanıcı ara, arkadaş ekle ve birbirinin vitrinini gez.
+- **GP Hediyeleşme**: Arkadaşlarına GP göndererek onlara destek ol.
+- **Liderlik Tablosu**: En şanslı ve en zengin falcılar arasında yerini al, prestijli çerçevelerini sergile.
+
+### 🗺️ Günlük Görevler & Başarımlar
+- **Görev Sistemi**: "Günün Falı", "Mistik Destekçi" gibi görevleri tamamla, ekstra GP kazan.
+- **Madalya Kutusu**: Kazandığın başarımları profilinde sergile.
+
+### 🧠 Haftalık Kader Analizi
+- **AI Sentezi**: Son 7 gündeki tüm fallarını analiz eden ve haftalık hayat rehberini sunan yapay zeka raporu.
+
+### 🎂 Doğum Günü Sürprizi
+- Doğum gününde giriş yapanlara **+500 GP** hediyesi ve o günkü çekimde yüksek şans oranı!
+
+---
+
+## 📱 Ekranlar
+
+| Ekran | Açıklama |
+|-------|----------|
+| 🎰 **Fal Çek** | Slot makinesiyle günlük fal çekimi |
+| ☕ **Kahve Falı** | Fincan fotoğrafıyla AI kahve falı |
+| 🏆 **Liderlik** | En şanslı falcılar sıralaması |
+| 🖼️ **Koleksiyon** | Çektiğin tüm falları sergile |
+| 🏪 **Pazar** | Fallarını satışa çıkar veya satın al |
+| 👥 **Sosyal** | Arkadaş ekle, GP hediyele |
+| 👤 **Profil** | Başarımlar, haftalık analiz, doğum günü |
+| 🛒 **Mağaza** | Avatar çerçeveleri ve dekorasyonlar |
 
 ---
 
 ## 🚀 Teknolojik Altyapı
 
-*   **Frontend (Mobile & Web):** React Native, Expo, Expo Router, NativeWind (Tailwind CSS v3/v4), TypeScript.
-*   **Backend (API):** C# .NET 8 Web API, Entity Framework Core (SQLite).
-*   **Gerçek Zamanlı İletişim (WebSockets):** ASP.NET Core SignalR (Canlı bildirimler ve hediyeleşme).
-*   **Yapay Zeka (AI):** OpenAI (DALL-E 3 Görüntü Üretimi & GPT-4 Metin Yorumlama).
-*   **Bildirim Mimari:** Expo Push Notifications.
+| Katman | Teknoloji |
+|--------|-----------|
+| **Frontend** | React Native (Expo SDK 53), Expo Router, NativeWind v4 (Tailwind CSS), Reanimated |
+| **Backend** | .NET 8 Web API, Entity Framework Core, SQLite |
+| **İletişim** | SignalR (Real-time), Expo Push Notifications |
+| **Yapay Zeka** | OpenAI API — GPT-4o (metin), GPT-4 Vision (kahve falı analizi), DALL-E 3 (görsel üretimi) |
+| **Medya** | expo-image-picker (kamera/galeri), multipart form data upload |
 
 ---
 
-## 🔥 Temel Özellikler
+## 🛠️ Kurulum & Geliştirme
 
-1.  **Günlük Gacha Çekilişi (Daily Fortune):**
-    Kullanıcılar her gün giriş yaptıklarında bir Gacha kutusu açma hakkı kazanırlar.
-2.  **Yapay Zeka Entagrasyonu:**
-    Common ve Uncommon kartlar statik bir görsel havuzundan rastgele çekilirken, Rare ve Legendary fallarında **Prompt Engineering** devreye girer. API arka planda sizin için kişiselleştirilmiş bir Tarot kartı görselleştirir (DALL-E 3) ve bir fal metni yorumlar.
-3.  **Vitrin (Showcase) ve Sosyal Deneyim:**
-    Kullanıcılar çektikleri falları saklayıp, profillerindeki "Showcase" (Vitrin) bölümünde sergileyebilir, böylece diğer arkadaşları bu falları görebilir, beğenebilir ve onlara canlı ("SignalR") bildirim gönderebilirler.
-4.  **Arkadaşlık Sistemi:**
-    Diğer kullanıcıların profilini görüntüleme, arkadaş olarak ekleme.
-5.  **Oyunlaştırma (Gamification):**
-    Uygulama içi etkinlikler yaparak "Gacha Point" (GP) ve "Rozetler / Başarımlar" kazanın. Kazandığınız bu özel materyaller profilinizi tamamen özelleştirebileceğiniz bir ekosistem sağlar.
+### Ön Koşullar
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [Node.js 18+](https://nodejs.org/)
+- [Expo CLI](https://docs.expo.dev/) (`npm install -g expo-cli`)
+- [Expo Go](https://expo.dev/go) (telefona yükle)
 
----
-
-## 🛠️ Kurulum & Geliştirme (Local Development)
-
-### Gereksinimler
-*   [Node.js (LTS)](https://nodejs.org/en/)
-*   [.NET 8 SDK](https://dotnet.microsoft.com/download)
-*   Expo Go (Telefon İçin) veya Android Studio / Xcode Emülatörleri.
-
-### REST API (Backend) Kurulumu
-1. `src/FortuneGacha.Api` klasörüne gidin.
-2. `appsettings.json` içerisine `OpenAI:ApiKey` bilginizi girin.
-3. Terminalde şu komutları çalıştırın:
+### Backend Kurulumu
 ```bash
+cd src/FortuneGacha.Api
+
+# (Opsiyonel) OpenAI API Key'ini ayarla
+# appsettings.json → "OpenAI:ApiKey" alanını doldur
+# API Key yoksa otomatik olarak Mock modu çalışır
+
 dotnet restore
-dotnet run
+dotnet run --urls="http://0.0.0.0:5132"
 ```
-API varsayılan olarak `http://localhost:5131` adresinde ayağa kalkacaktır (Ve Swagger arabirimi devreye girecektir).
 
-### Expo (Frontend) Kurulumu
-1. `src/FortuneGacha.Client` klasörüne gidin.
-2. Bağımlılıkları yükleyin:
+### Frontend Kurulumu
 ```bash
+cd src/FortuneGacha.Client
+
 npm install --legacy-peer-deps
+
+# src/api/api.ts içindeki SERVER_URL'i kendi IP'nle güncelle:
+# const SERVER_URL = 'http://SENIN_IP_ADRESIN:5132';
+
+npx expo start -c
 ```
-3. Expo Metro Bundler'ı başlatın:
-```bash
-npx expo start
+
+### 📱 Telefonda Test
+1. Backend ve Frontend'i başlat
+2. Telefondaki **Expo Go** uygulamasını aç
+3. QR kodu tara veya IP adresini manuel gir
+4. **Yeni hesap oluştur** (Kayıt Ol) ve uygulamayı keşfet!
+
+---
+
+## ⚙️ Yapılandırma
+
+### Mock Mod (Varsayılan)
+OpenAI API Key olmadan çalışır. Rastgele fal metni, placeholder görsel ve mock kahve falı yorumu üretir.
+
+```csharp
+// Program.cs — Mock Mod (varsayılan)
+builder.Services.AddScoped<IGachaService, MockGachaService>();
 ```
-Telefonunuzdaki Expo Go ile karekodu okutabilir veya `w` tuşuna basarak web deneyiminden yararlanabilirsiniz.
+
+### AI Mod (Canlı)
+Gerçek AI deneyimi için OpenAI API Key gereklidir.
+
+```csharp
+// Program.cs — AI Mod
+builder.Services.AddScoped<IGachaService, GachaServiceV2>();
+```
+
+```json
+// appsettings.json
+{
+  "OpenAI": {
+    "ApiKey": "sk-...",
+    "TextModel": "gpt-4o",
+    "ImageModel": "dall-e-3"
+  }
+}
+```
+
+> **Maliyet Tahmini (AI Mod)**
+> - Günlük Fal Çekimi: ~$0.05/istek (metin + görsel)
+> - Kahve Falı: ~$0.10/istek (vision analiz + görsel üretimi)
+
+---
+
+## 📂 Proje Yapısı
+
+```
+FortuneGachaApp/
+├── src/
+│   ├── FortuneGacha.Api/           # .NET 8 Backend
+│   │   ├── Controllers/
+│   │   │   ├── AuthController.cs        # Giriş/Kayıt/Profil
+│   │   │   ├── FortuneController.cs     # Gacha fal çekimi
+│   │   │   ├── CoffeeFortuneController.cs # ☕ Kahve falı
+│   │   │   ├── MarketplaceController.cs # Pazar yeri
+│   │   │   ├── ShopController.cs        # Mağaza
+│   │   │   ├── SocialController.cs      # Arkadaşlık & sosyal
+│   │   │   └── QuestController.cs       # Görevler
+│   │   ├── Models/
+│   │   │   ├── GachaProfile.cs          # Kullanıcı modeli
+│   │   │   ├── DailyFortune.cs          # Günlük fal
+│   │   │   ├── CoffeeFortune.cs         # ☕ Kahve falı
+│   │   │   ├── SocialAchievements.cs    # Başarımlar
+│   │   │   ├── Quest.cs                 # Görevler
+│   │   │   └── Decoration.cs            # Dekorasyonlar
+│   │   ├── Services/
+│   │   │   ├── GachaService.cs          # Mock AI servisi
+│   │   │   ├── GachaServiceV2.cs        # Gerçek AI servisi (OpenAI)
+│   │   │   └── QuestService.cs          # Görev takibi
+│   │   └── Data/
+│   │       └── GachaDbContext.cs        # EF Core veritabanı
+│   │
+│   └── FortuneGacha.Client/       # React Native Frontend
+│       ├── app/
+│       │   ├── index.tsx                # Giriş/Kayıt ekranı
+│       │   ├── _layout.tsx              # Ana layout
+│       │   └── (tabs)/
+│       │       ├── gacha.tsx            # 🎰 Fal çekme
+│       │       ├── coffee.tsx           # ☕ Kahve falı
+│       │       ├── leaderboard.tsx      # 🏆 Liderlik
+│       │       ├── showcase.tsx         # 🖼️ Koleksiyon
+│       │       ├── market.tsx           # 🏪 Pazar
+│       │       ├── friends.tsx          # 👥 Sosyal
+│       │       ├── profile.tsx          # 👤 Profil
+│       │       └── shop.tsx             # 🛒 Mağaza
+│       └── src/
+│           ├── api/api.ts               # API istemcisi
+│           ├── components/              # Bileşenler
+│           └── hooks/                   # Custom hooks
+└── README.md
+```
+
+---
+
+## 🔮 Gelecek Özellikler (Roadmap)
+
+- [ ] Tarot Kartı Falı
+- [ ] El Falı (Avuç İçi Analizi)
+- [ ] Rüya Yorumlama
+- [ ] Günlük Burç Yorumları
+- [ ] Arkadaşlarla Canlı Fal Odası
+- [ ] App Store / Google Play yayını
 
 ---
 
 ## 📜 Lisans
-
-Bu proje kişisel kullanım/test için hazırlanmıştır. Ticari lisans ve haklar geliştiricisine aittir.
+Bu proje kişisel kullanım ve test amaçlı hazırlanmıştır. Tüm hakları saklıdır.

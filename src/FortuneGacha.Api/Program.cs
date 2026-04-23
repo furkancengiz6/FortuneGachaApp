@@ -16,15 +16,16 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
-builder.Services.AddScoped<IGachaService, GachaServiceV2>();
+builder.Services.AddScoped<IGachaService, MockGachaService>();
 builder.Services.AddHttpClient<INotificationService, ExpoNotificationService>();
+builder.Services.AddScoped<IQuestService, QuestService>();
 builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:19006", "http://10.0.2.2:8081", "http://localhost:8081")
+        policy.SetIsOriginAllowed(_ => true) // Tüm yerel ağ cihazlarına izin ver
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -115,6 +116,16 @@ using (var scope = app.Services.CreateScope())
             new Decoration { Name = "Mistik Mor", Type = "AvatarFrame", Price = 50, ImageUrl = "frame_purple", Rarity = "Common" },
             new Decoration { Name = "Altın Şafak", Type = "AvatarFrame", Price = 250, ImageUrl = "frame_gold", Rarity = "Rare" },
             new Decoration { Name = "Efsanevi Ejder", Type = "AvatarFrame", Price = 1000, ImageUrl = "frame_dragon", Rarity = "Legendary" }
+        );
+        context.SaveChanges();
+    }
+
+    if (!context.Quests.Any())
+    {
+        context.Quests.AddRange(
+            new Quest { Name = "Günün Falı", Description = "Bugün 1 adet fal çek.", Type = "Draw", TargetCount = 1, GpReward = 50 },
+            new Quest { Name = "Mistik Destekçi", Description = "Diğer falcıların 3 falını beğen.", Type = "Like", TargetCount = 3, GpReward = 30 },
+            new Quest { Name = "Sosyal Keşif", Description = "1 yeni arkadaş ekle.", Type = "Friend", TargetCount = 1, GpReward = 100 }
         );
         context.SaveChanges();
     }

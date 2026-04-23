@@ -11,43 +11,45 @@ using FortuneGacha.Api.Services;
 namespace FortuneGacha.Api.Controllers;
 
 [ApiController]
-[Route("api/social")] // Route remains same, only class name changes
+[Route("api/social")]
 [Authorize]
 public class SocialHubController : ControllerBase
 {
     private readonly GachaDbContext _context;
     private readonly IHubContext<NotificationHub> _hubContext;
     private readonly INotificationService _notificationService;
+    private readonly IQuestService _questService;
 
-    public SocialHubController(GachaDbContext context, IHubContext<NotificationHub> hubContext, INotificationService notificationService)
+    public SocialHubController(GachaDbContext context, IHubContext<NotificationHub> hubContext, INotificationService notificationService, IQuestService questService)
     {
         _context = context;
         _hubContext = hubContext;
         _notificationService = notificationService;
+        _questService = questService;
     }
 
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string q)
     {
-        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (currentUserIdString == null) return Unauthorized();
-        var currentUserId = int.Parse(currentUserIdString);
+        var uidClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (uidClaim == null) return Unauthorized();
+        var currentUserId = int.Parse(uidClaim);
 
-        var users = await _context.Users
+        var profiles = await _context.Users
             .Where(u => u.Id != currentUserId && u.Username.Contains(q))
             .Select(u => new { u.Id, u.Username })
             .Take(10)
             .ToListAsync();
 
-        return Ok(users);
+        return Ok(profiles);
     }
 
     [HttpPost("request/{userId}")]
     public async Task<IActionResult> SendRequest(int userId)
     {
-        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (currentUserIdString == null) return Unauthorized();
-        var currentUserId = int.Parse(currentUserIdString);
+        var uidClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (uidClaim == null) return Unauthorized();
+        var currentUserId = int.Parse(uidClaim);
 
         if (userId == currentUserId) return BadRequest("Kendine arkadaşlık isteği gönderemezsin.");
 
@@ -68,21 +70,21 @@ public class SocialHubController : ControllerBase
         _context.Friendships.Add(friendship);
         await _context.SaveChangesAsync();
 
-        var senderUser = await _context.Users.FindAsync(currentUserId);
-        var receiverUser = await _context.Users.FindAsync(userId);
+        var sender = await _context.Users.FindAsync(currentUserId);
+        var receiver = await _context.Users.FindAsync(userId);
 
         await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceiveNotification", new 
         { 
             title = "Yeni Arkadaşlık İsteği", 
-            message = $"{senderUser?.Username} sana bir arkadaşlık isteği gönderdi!" 
+            message = $"{sender?.Username} sana bir arkadaşlık isteği gönderdi!" 
         });
 
-        if (receiverUser != null && !string.IsNullOrEmpty(receiverUser.PushToken))
+        if (receiver != null && !string.IsNullOrEmpty(receiver.PushToken))
         {
             await _notificationService.SendPushNotificationAsync(
-                receiverUser.PushToken, 
+                receiver.PushToken, 
                 "Yeni Arkadaşlık İsteği", 
-                $"{senderUser?.Username} sana bir arkadaşlık isteği gönderdi!"
+                $"{sender?.Username} sana bir arkadaşlık isteği gönderdi!"
             );
         }
 
@@ -92,9 +94,9 @@ public class SocialHubController : ControllerBase
     [HttpPost("respond/{requestId}")]
     public async Task<IActionResult> RespondRequest(int requestId, [FromQuery] bool accept)
     {
-        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (currentUserIdString == null) return Unauthorized();
-        var currentUserId = int.Parse(currentUserIdString);
+        var uidClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (uidClaim == null) return Unauthorized();
+        var currentUserId = int.Parse(uidClaim);
 
         var request = await _context.Friendships.FindAsync(requestId);
         if (request == null || request.ReceiverId != currentUserId) return NotFound("İstek bulunamadı.");
@@ -102,10 +104,10 @@ public class SocialHubController : ControllerBase
         if (accept)
         {
             request.Status = "Accepted";
-            var u1 = await _context.Users.FindAsync(request.RequesterId);
-            var u2 = await _context.Users.FindAsync(request.ReceiverId);
-            if (u1 != null) u1.GachaPoints += 50;
-            if (u2 != null) u2.GachaPoints += 50;
+            var r1 = await _context.Users.FindAsync(request.RequesterId);
+            var r2 = await _context.Users.FindAsync(request.ReceiverId);
+            if (r1 != null) r1.GachaPoints += 50;
+            if (r2 != null) r2.GachaPoints += 50;
         }
         else
         {
@@ -113,15 +115,22 @@ public class SocialHubController : ControllerBase
         }
 
         await _context.SaveChangesAsync();
+
+        if (accept)
+        {
+            await _questService.UpdateProgressAsync(request.RequesterId, "Friend");
+            await _questService.UpdateProgressAsync(request.ReceiverId, "Friend");
+        }
+
         return Ok(new { Message = accept ? "İstek kabul edildi." : "İstek reddedildi." });
     }
 
     [HttpGet("friends")]
     public async Task<IActionResult> GetFriends()
     {
-        var currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (currentUserIdString == null) return Unauthorized();
-        var currentUserId = int.Parse(currentUserIdString);
+        var uidClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (uidClaim == null) return Unauthorized();
+        var currentUserId = int.Parse(uidClaim);
 
         var friends = await _context.Friendships
             .Where(f => f.Status == "Accepted" && (f.RequesterId == currentUserId || f.ReceiverId == currentUserId))
@@ -135,9 +144,9 @@ public class SocialHubController : ControllerBase
     [HttpPost("like/{fortuneId}")]
     public async Task<IActionResult> Like(int fortuneId)
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userIdString == null) return Unauthorized();
-        var userId = int.Parse(userIdString);
+        var uidClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (uidClaim == null) return Unauthorized();
+        var userId = int.Parse(uidClaim);
 
         if (await _context.Likes.AnyAsync(l => l.DailyFortuneId == fortuneId && l.UserId == userId))
         {
@@ -147,14 +156,16 @@ public class SocialHubController : ControllerBase
         _context.Likes.Add(new Like { DailyFortuneId = fortuneId, UserId = userId });
 
         var currentLiker = await _context.Users.FindAsync(userId);
-        var fortune = await _context.DailyFortunes.Include(f => f.User).FirstOrDefaultAsync(f => f.Id == fortuneId);
+        var fortune = await _context.DailyFortunes.Include(f => f.Profile).FirstOrDefaultAsync(f => f.Id == fortuneId);
 
         if (currentLiker != null) currentLiker.GachaPoints += 1;
-        if (fortune?.User != null) fortune.User.GachaPoints += 5;
+        if (fortune?.Profile != null) fortune.Profile.GachaPoints += 5;
 
         await _context.SaveChangesAsync();
 
-        if (fortune?.User != null && fortune.UserId != userId)
+        await _questService.UpdateProgressAsync(userId, "Like");
+
+        if (fortune?.Profile != null && fortune.UserId != userId)
         {
             await _hubContext.Clients.User(fortune.UserId.ToString()).SendAsync("ReceiveNotification", new 
             { 
@@ -162,10 +173,10 @@ public class SocialHubController : ControllerBase
                 message = $"{currentLiker?.Username} senin bir falını beğendi." 
             });
 
-            if (!string.IsNullOrEmpty(fortune.User.PushToken))
+            if (!string.IsNullOrEmpty(fortune.Profile.PushToken))
             {
                 await _notificationService.SendPushNotificationAsync(
-                    fortune.User.PushToken, 
+                    fortune.Profile.PushToken, 
                     "Falın Beğenildi!", 
                     $"{currentLiker?.Username} senin bir falını beğendi."
                 );
@@ -175,16 +186,74 @@ public class SocialHubController : ControllerBase
         return Ok(new { Message = "Beğenildi." });
     }
 
+    [HttpPost("gift/gp/{friendId}")]
+    public async Task<IActionResult> GiftGp(int friendId, [FromQuery] int amount)
+    {
+        var uidClaim = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (uidClaim == null) return Unauthorized();
+        var currentUserId = int.Parse(uidClaim);
+
+        if (amount <= 0) return BadRequest("Geçersiz miktar.");
+
+        var sender = await _context.Users.FindAsync(currentUserId);
+        var receiver = await _context.Users.FindAsync(friendId);
+
+        if (sender == null || receiver == null) return NotFound();
+        if (sender.GachaPoints < amount) return BadRequest("Yetersiz Gacha Puanı.");
+
+        // Arkadaşlık kontrolü
+        var isFriend = await _context.Friendships.AnyAsync(f => 
+            f.Status == "Accepted" && 
+            ((f.RequesterId == currentUserId && f.ReceiverId == friendId) || 
+             (f.RequesterId == friendId && f.ReceiverId == currentUserId)));
+
+        if (!isFriend) return BadRequest("Sadece arkadaşlarına hediye gönderebilirsin.");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            sender.GachaPoints -= amount;
+            receiver.GachaPoints += amount;
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            await _hubContext.Clients.User(friendId.ToString()).SendAsync("ReceiveNotification", new 
+            { 
+                title = "Hediye Geldi! 🎁", 
+                message = $"{sender.Username} sana {amount} GP hediye etti!" 
+            });
+
+            return Ok(new { Message = "Hediye başarıyla gönderildi.", NewBalance = sender.GachaPoints });
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            return StatusCode(500, "İşlem başarısız.");
+        }
+    }
+
     [HttpGet("leaderboard")]
     public async Task<IActionResult> GetLeaderboard()
     {
         var leaderlist = await _context.Users
+            .Include(u => u.UserDecorations)
+                .ThenInclude(ud => ud.Decoration)
             .OrderByDescending(u => u.GachaPoints)
             .Take(100)
             .ToListAsync();
             
-        var result = leaderlist.Select((u, i) => new { u.Username, u.GachaPoints, Rank = i + 1 });
+        var leaderboard = leaderlist.Select((u, i) => new 
+        { 
+            u.Username, 
+            u.GachaPoints, 
+            Rank = i + 1,
+            Equipped = u.UserDecorations
+                .Where(ud => ud.IsEquipped)
+                .Select(ud => new { ud.Decoration.Type, ud.Decoration.ImageUrl })
+                .ToList()
+        });
 
-        return Ok(result);
+        return Ok(leaderboard);
     }
 }

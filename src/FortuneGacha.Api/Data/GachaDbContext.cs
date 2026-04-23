@@ -9,14 +9,17 @@ public class GachaDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users => Set<User>();
+    public DbSet<GachaProfile> Users => Set<GachaProfile>();
     public DbSet<DailyFortune> DailyFortunes => Set<DailyFortune>();
     public DbSet<Friendship> Friendships => Set<Friendship>();
     public DbSet<Like> Likes => Set<Like>();
     public DbSet<Achievement> Achievements => Set<Achievement>();
     public DbSet<UserAchievement> UserAchievements => Set<UserAchievement>();
-    public DbSet<Decoration> Decorations => Set<Decoration>();
-    public DbSet<UserDecoration> UserDecorations => Set<UserDecoration>();
+    public DbSet<Decoration> Decorations { get; set; }
+    public DbSet<UserDecoration> UserDecorations { get; set; }
+    public DbSet<Quest> Quests { get; set; }
+    public DbSet<UserQuest> UserQuests { get; set; }
+    public DbSet<CoffeeFortune> CoffeeFortunes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,8 +40,8 @@ public class GachaDbContext : DbContext
 
         // User and DailyFortune
         modelBuilder.Entity<DailyFortune>()
-            .HasOne(d => d.User)
-            .WithMany(u => u.DailyFortunes)
+            .HasOne(d => d.Profile)
+            .WithMany(u => u.MyDailyFortunes)
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -50,7 +53,7 @@ public class GachaDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Like>()
-            .HasOne(l => l.User)
+            .HasOne(l => l.Profile)
             .WithMany()
             .HasForeignKey(l => l.UserId)
             .OnDelete(DeleteBehavior.Restrict);
@@ -58,5 +61,19 @@ public class GachaDbContext : DbContext
         // UserDecorations composite key
         modelBuilder.Entity<UserDecoration>()
             .HasKey(ud => new { ud.UserId, ud.DecorationId });
+
+        modelBuilder.Entity<UserQuest>()
+            .HasKey(uq => new { uq.UserId, uq.QuestId });
+
+        // UserAchievements explicit configuration
+        modelBuilder.Entity<UserAchievement>()
+            .HasOne(ua => ua.Profile)
+            .WithMany()
+            .HasForeignKey(ua => ua.UserId);
+
+        modelBuilder.Entity<UserAchievement>()
+            .HasOne(ua => ua.Achievement)
+            .WithMany()
+            .HasForeignKey(ua => ua.AchievementId);
     }
 }

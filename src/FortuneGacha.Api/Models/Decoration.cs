@@ -29,7 +29,7 @@ public class UserDecoration
     public int UserId { get; set; }
     
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = null!;
+    public GachaProfile Profile { get; set; } = null!;
 
     [Required]
     public int DecorationId { get; set; }

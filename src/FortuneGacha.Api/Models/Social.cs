@@ -15,10 +15,10 @@ public class Friendship
     public int ReceiverId { get; set; }
 
     [ForeignKey(nameof(RequesterId))]
-    public User Requester { get; set; } = null!;
+    public GachaProfile Requester { get; set; } = null!;
 
     [ForeignKey(nameof(ReceiverId))]
-    public User Receiver { get; set; } = null!;
+    public GachaProfile Receiver { get; set; } = null!;
 
     [Required]
     public string Status { get; set; } = "Pending"; // Pending, Accepted, Blocked
@@ -41,7 +41,7 @@ public class Like
     public DailyFortune DailyFortune { get; set; } = null!;
 
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = null!;
+    public GachaProfile Profile { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

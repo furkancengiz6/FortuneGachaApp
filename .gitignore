@@ -24,9 +24,27 @@ build/
 .env.development
 .env.test
 .env.production
+appsettings.Development.json
 
 # IDEs
 .idea/
 .vscode/
 *.suo
 *.user
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Build & Debug Logs
+backend_log.txt
+build_errors.txt
+build_output.txt
+build_diag.txt
+build_err.txt
+build_err2.txt
+build_err_utf8.txt
+errors.log
+final_*.txt
+last_3_errors.txt

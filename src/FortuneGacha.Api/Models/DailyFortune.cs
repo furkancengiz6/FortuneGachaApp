@@ -12,7 +12,7 @@ public class DailyFortune
     public int UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = null!;
+    public GachaProfile Profile { get; set; } = null!;
 
     [Required]
     public string FortuneText { get; set; } = string.Empty;
@@ -21,6 +21,7 @@ public class DailyFortune
     public string ImageUrl { get; set; } = string.Empty;
 
     public string Rarity { get; set; } = "Common"; // Common, Rare, Legendary
+    public string DailyCommentary { get; set; } = string.Empty;
 
     public bool IsPublic { get; set; } = true;
     public bool IsForSale { get; set; } = false;

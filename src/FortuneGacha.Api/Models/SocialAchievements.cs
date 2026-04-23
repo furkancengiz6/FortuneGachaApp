@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FortuneGacha.Api.Models;
 
@@ -22,9 +23,13 @@ public class UserAchievement
     public int Id { get; set; }
 
     public int UserId { get; set; }
-    public User User { get; set; } = null!;
+    
+    [ForeignKey(nameof(UserId))]
+    public GachaProfile Profile { get; set; } = null!;
 
     public int AchievementId { get; set; }
+    
+    [ForeignKey(nameof(AchievementId))]
     public Achievement Achievement { get; set; } = null!;
 
     public DateTime EarnedDate { get; set; } = DateTime.UtcNow;

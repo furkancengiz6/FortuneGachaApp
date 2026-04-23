@@ -49,6 +49,10 @@ namespace FortuneGacha.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("DailyCommentary")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("DrawDate")
                         .HasColumnType("TEXT");
 
@@ -140,31 +144,7 @@ namespace FortuneGacha.Api.Migrations
                     b.ToTable("Friendships");
                 });
 
-            modelBuilder.Entity("FortuneGacha.Api.Models.Like", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("DailyFortuneId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DailyFortuneId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Likes");
-                });
-
-            modelBuilder.Entity("FortuneGacha.Api.Models.User", b =>
+            modelBuilder.Entity("FortuneGacha.Api.Models.GachaProfile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,6 +180,30 @@ namespace FortuneGacha.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("FortuneGacha.Api.Models.Like", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DailyFortuneId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DailyFortuneId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Likes");
+                });
+
             modelBuilder.Entity("FortuneGacha.Api.Models.UserAchievement", b =>
                 {
                     b.Property<int>("Id")
@@ -212,6 +216,9 @@ namespace FortuneGacha.Api.Migrations
                     b.Property<DateTime>("EarnedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
@@ -219,7 +226,7 @@ namespace FortuneGacha.Api.Migrations
 
                     b.HasIndex("AchievementId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ProfileId");
 
                     b.ToTable("UserAchievements");
                 });
@@ -247,24 +254,24 @@ namespace FortuneGacha.Api.Migrations
 
             modelBuilder.Entity("FortuneGacha.Api.Models.DailyFortune", b =>
                 {
-                    b.HasOne("FortuneGacha.Api.Models.User", "User")
-                        .WithMany("DailyFortunes")
+                    b.HasOne("FortuneGacha.Api.Models.GachaProfile", "Profile")
+                        .WithMany("MyDailyFortunes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("FortuneGacha.Api.Models.Friendship", b =>
                 {
-                    b.HasOne("FortuneGacha.Api.Models.User", "Receiver")
+                    b.HasOne("FortuneGacha.Api.Models.GachaProfile", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("FortuneGacha.Api.Models.User", "Requester")
+                    b.HasOne("FortuneGacha.Api.Models.GachaProfile", "Requester")
                         .WithMany()
                         .HasForeignKey("RequesterId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -283,7 +290,7 @@ namespace FortuneGacha.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FortuneGacha.Api.Models.User", "User")
+                    b.HasOne("FortuneGacha.Api.Models.GachaProfile", "Profile")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -291,7 +298,7 @@ namespace FortuneGacha.Api.Migrations
 
                     b.Navigation("DailyFortune");
 
-                    b.Navigation("User");
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("FortuneGacha.Api.Models.UserAchievement", b =>
@@ -302,15 +309,15 @@ namespace FortuneGacha.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FortuneGacha.Api.Models.User", "User")
+                    b.HasOne("FortuneGacha.Api.Models.GachaProfile", "Profile")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Achievement");
 
-                    b.Navigation("User");
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("FortuneGacha.Api.Models.UserDecoration", b =>
@@ -321,7 +328,7 @@ namespace FortuneGacha.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FortuneGacha.Api.Models.User", "User")
+                    b.HasOne("FortuneGacha.Api.Models.GachaProfile", "Profile")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -329,7 +336,7 @@ namespace FortuneGacha.Api.Migrations
 
                     b.Navigation("Decoration");
 
-                    b.Navigation("User");
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("FortuneGacha.Api.Models.DailyFortune", b =>
@@ -337,9 +344,9 @@ namespace FortuneGacha.Api.Migrations
                     b.Navigation("Likes");
                 });
 
-            modelBuilder.Entity("FortuneGacha.Api.Models.User", b =>
+            modelBuilder.Entity("FortuneGacha.Api.Models.GachaProfile", b =>
                 {
-                    b.Navigation("DailyFortunes");
+                    b.Navigation("MyDailyFortunes");
                 });
 #pragma warning restore 612, 618
         }

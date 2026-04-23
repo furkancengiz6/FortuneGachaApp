@@ -8,7 +8,7 @@ namespace FortuneGacha.Api.Services;
 
 public interface IAuthService
 {
-    string GenerateToken(User user);
+    string GenerateToken(GachaProfile user);
 }
 
 public class AuthService : IAuthService
@@ -20,7 +20,7 @@ public class AuthService : IAuthService
         _config = config;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(GachaProfile user)
     {
         var jwtSettings = _config.GetSection("Jwt");
         var key = Encoding.ASCII.GetBytes(jwtSettings["Key"] ?? "SUPER_SECRET_KEY_FOR_TESTING_PURPOSES_ONLY");
