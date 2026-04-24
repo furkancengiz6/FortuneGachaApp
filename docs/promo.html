@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fortune Gacha - Tanıtım</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #050507;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 30%, rgba(124,58,237,0.15) 0%, transparent 70%),
+              radial-gradient(ellipse at 80% 80%, rgba(251,191,36,0.08) 0%, transparent 50%);
+  position: relative;
+  text-align: center;
+  padding: 40px 20px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+.hero-content { position: relative; z-index: 1; }
+.logo-icon { font-size: 80px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+.hero h1 {
+  font-size: 64px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa, #fbbf24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+  letter-spacing: -2px;
+}
+.hero .tagline {
+  font-size: 22px;
+  color: #888;
+  font-weight: 300;
+  margin-bottom: 40px;
+  max-width: 500px;
+}
+.hero-badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.badge {
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+}
+.badge.ai { border-color: rgba(124,58,237,0.4); color: #a78bfa; }
+.badge.social { border-color: rgba(251,191,36,0.4); color: #fbbf24; }
+.badge.game { border-color: rgba(52,211,153,0.4); color: #34d399; }
+
+/* Section */
+.section {
+  padding: 100px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #7c3aed;
+  margin-bottom: 12px;
+}
+.section h2 {
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+}
+.section .desc {
+  font-size: 18px;
+  color: #888;
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 50px;
+}
+
+/* Feature Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+.feature-card {
+  background: rgba(15,15,20,0.8);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 24px;
+  padding: 36px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.feature-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.12); }
+.feature-card:hover::before { opacity: 1; }
+.feature-icon { font-size: 48px; margin-bottom: 20px; display: block; }
+.feature-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.feature-card p { color: #888; line-height: 1.6; font-size: 15px; }
+
+/* Phone Mockup Sections */
+.showcase {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  padding: 80px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.showcase.reverse { flex-direction: row-reverse; }
+.showcase-text { flex: 1; }
+.showcase-text .label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+.showcase-text h2 { font-size: 42px; font-weight: 900; margin-bottom: 16px; letter-spacing: -1px; }
+.showcase-text p { color: #888; font-size: 16px; line-height: 1.8; margin-bottom: 24px; }
+.showcase-visual { flex: 1; display: flex; justify-content: center; }
+
+/* Phone Frame */
+.phone {
+  width: 280px;
+  height: 560px;
+  background: #111;
+  border-radius: 40px;
+  border: 3px solid #222;
+  padding: 12px;
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 60px rgba(124,58,237,0.1);
+}
+.phone-notch {
+  width: 120px;
+  height: 28px;
+  background: #000;
+  border-radius: 0 0 20px 20px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Screen: Login */
+.screen-login {
+  background: linear-gradient(180deg, #0a0a0c 0%, #111 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.screen-login .app-name { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, #7c3aed, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; }
+.screen-login .sub { font-size: 11px; color: #666; margin-bottom: 30px; }
+.screen-login .input { width: 100%; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 10px; padding: 0 12px; display: flex; align-items: center; }
+.screen-login .input span { color: #555; font-size: 11px; }
+.screen-login .btn { width: 100%; height: 38px; background: #7c3aed; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; margin-top: 6px; }
+
+/* Screen: Gacha */
+.screen-gacha {
+  background: #0a0a0c;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.screen-gacha .gp { position: absolute; top: 16px; right: 16px; font-size: 10px; color: #fbbf24; background: rgba(251,191,36,0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(251,191,36,0.2); }
+.screen-gacha .title { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.screen-gacha .sub { font-size: 10px; color: #666; margin-bottom: 20px; }
+.slot-machine { background: rgba(251,191,36,0.08); border: 3px solid rgba(251,191,36,0.2); border-radius: 24px; padding: 20px; position: relative; margin-bottom: 16px; }
+.slot-machine .tag { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fbbf24; color: #000; font-size: 8px; font-weight: 900; padding: 2px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.slot-reels { display: flex; gap: 8px; }
+.reel { width: 60px; height: 70px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.lever { display: flex; flex-direction: column; align-items: center; margin-top: 8px; }
+.lever-rod { width: 2px; height: 30px; background: rgba(251,191,36,0.3); }
+.lever-ball { width: 16px; height: 16px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
+.spin-btn { background: #fbbf24; color: #000; font-weight: 900; font-size: 12px; padding: 12px 32px; border-radius: 16px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Screen: Coffee */
+.screen-coffee {
+  background: #0a0a0c;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  padding-top: 40px;
+}
+.screen-coffee .title { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.screen-coffee .sub { font-size: 10px; color: #666; margin-bottom: 16px; text-align: center; }
+.cup-area { width: 140px; height: 140px; border-radius: 20px; border: 2px dashed rgba(167,139,250,0.3); display: flex; align-items: center; justify-content: center; flex-direction: column; margin-bottom: 16px; background: rgba(167,139,250,0.05); }
+.cup-area .icon { font-size: 40px; margin-bottom: 6px; }
+.cup-area .text { font-size: 9px; color: #6b5e4f; }
+.coffee-btns { display: flex; gap: 8px; margin-bottom: 12px; }
+.coffee-btn { padding: 8px 14px; border-radius: 12px; font-size: 10px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 4px; }
+.coffee-btn.cam { background: rgba(167,139,250,0.15); border: 1px solid rgba(167,139,250,0.3); }
+.coffee-btn.gal { background: rgba(74,55,40,0.2); border: 1px solid rgba(74,55,40,0.4); }
+.read-btn { background: #a78bfa; color: #000; font-weight: 900; font-size: 12px; padding: 12px 36px; border-radius: 16px; }
+.coffee-info { font-size: 9px; color: #555; margin-top: 10px; }
+
+/* Screen: Result */
+.screen-result {
+  background: linear-gradient(180deg, #0a0a0c 0%, #0f0a1a 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  padding-top: 30px;
+}
+.rarity-badge { padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
+.rarity-badge.legendary { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+.result-title { font-size: 18px; font-weight: 900; margin-bottom: 12px; text-align: center; }
+.result-card-img { width: 160px; height: 220px; border-radius: 16px; background: linear-gradient(135deg, #1a1025, #2d1b4e, #1a1025); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(167,139,250,0.2); overflow: hidden; position: relative; }
+.result-card-img .glow { position: absolute; width: 100px; height: 100px; background: radial-gradient(circle, rgba(167,139,250,0.3), transparent); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.result-card-img .symbol { font-size: 60px; position: relative; z-index: 1; }
+.reading-box { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px; width: 100%; }
+.reading-box p { font-size: 10px; color: #aaa; line-height: 1.6; }
+.gp-reward { background: rgba(251,191,36,0.1); border-radius: 10px; padding: 8px; text-align: center; width: 100%; }
+.gp-reward span { color: #fbbf24; font-weight: 700; font-size: 12px; }
+
+/* Tab Bar */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: #0a0a0c;
+  border-top: 1px solid #1a1a1e;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+}
+.tab { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.tab .icon { font-size: 16px; }
+.tab .label { font-size: 7px; color: #666; }
+.tab.active .label { color: #7c3aed; }
+
+/* Tech Stack */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 40px;
+}
+.tech-item {
+  background: rgba(15,15,20,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 24px;
+}
+.tech-item .tech-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+.tech-item .tech-name { font-size: 18px; font-weight: 700; }
+
+/* CTA */
+.cta {
+  text-align: center;
+  padding: 120px 40px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(124,58,237,0.1) 0%, transparent 70%);
+}
+.cta h2 { font-size: 52px; font-weight: 900; margin-bottom: 16px; letter-spacing: -1px; }
+.cta p { color: #888; font-size: 18px; margin-bottom: 40px; }
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 40px;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 10px 40px rgba(124,58,237,0.3);
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Animations */
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeIn 0.8s ease forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
+
+/* Sparkle animation for slot reels */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.reel { animation: sparkle 2s ease-in-out infinite; }
+.reel:nth-child(2) { animation-delay: 0.3s; }
+.reel:nth-child(3) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="logo-icon">🔮</div>
+    <h1 class="fade-in">Fortune Gacha</h1>
+    <p class="tagline fade-in delay-1">Yapay zeka destekli mistik fal deneyimi.<br>Günlük fallar, kahve falı, koleksiyon kartları.</p>
+    <div class="hero-badges fade-in delay-2">
+      <span class="badge ai">🤖 GPT-4 & DALL-E 3</span>
+      <span class="badge social">👥 Sosyal Platform</span>
+      <span class="badge game">🎮 Gacha Mekaniği</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label">Özellikler</div>
+  <h2>Her Şey Tek Uygulamada</h2>
+  <p class="desc">Fal çekiminden kahve falına, görevlerden başarımlara — mistik bir deneyim seni bekliyor.</p>
+
+  <div class="features-grid">
+    <div class="feature-card" style="--accent: #7c3aed;">
+      <span class="feature-icon">🎰</span>
+      <h3>Gacha Slot Makinesi</h3>
+      <p>Makaralı slot makinesi ile günlük falını çek. Common'dan Legendary'ye nadir kartlar topla.</p>
+    </div>
+    <div class="feature-card" style="--accent: #a78bfa;">
+      <span class="feature-icon">☕</span>
+      <h3>Türk Kahvesi Falı</h3>
+      <p>Fincanını fotoğrafla, GPT-4 Vision ile AI yorumlasın. Yoruma göre benzersiz bir kart oluşturulsun.</p>
+    </div>
+    <div class="feature-card" style="--accent: #fbbf24;">
+      <span class="feature-icon">🎨</span>
+      <h3>DALL-E 3 Kartları</h3>
+      <p>Her fal çekiminde yapay zeka sana özel, eşsiz bir sanat eseri üretir. Koleksiyonunu büyüt.</p>
+    </div>
+    <div class="feature-card" style="--accent: #34d399;">
+      <span class="feature-icon">🤝</span>
+      <h3>Sosyal Platform</h3>
+      <p>Arkadaş ekle, GP hediyele, liderlik tablosunda yarış ve vitrinini sergile.</p>
+    </div>
+    <div class="feature-card" style="--accent: #f472b6;">
+      <span class="feature-icon">🗺️</span>
+      <h3>Görevler & Başarımlar</h3>
+      <p>Günlük görevleri tamamla, madalyalar kazan ve ekstra GP topla.</p>
+    </div>
+    <div class="feature-card" style="--accent: #60a5fa;">
+      <span class="feature-icon">🧠</span>
+      <h3>Haftalık AI Analizi</h3>
+      <p>Son 7 gündeki fallarını yapay zeka analiz edip sana özel haftalık kader rehberi sunar.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SHOWCASE: GACHA -->
+<div class="showcase">
+  <div class="showcase-text">
+    <div class="label" style="color: #fbbf24;">Fal Çekimi</div>
+    <h2>Kader Çarkını Çevir</h2>
+    <p>Slot makinesi mekaniği ile günlük falını çek. Common, Rare ve Legendary kartlardan hangisi sana çıkacak? Luck Boost ile şansını %15'e çıkar!</p>
+    <p style="color: #fbbf24; font-weight: 600;">🎰 Haptic feedback ile gerçekçi slot deneyimi</p>
+  </div>
+  <div class="showcase-visual">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="screen-gacha">
+          <div class="gp">GP: <span style="color:#fff">850</span></div>
+          <div class="title">Kader Çarkı</div>
+          <div class="sub">Bugünün kehaneti makaralarda saklı.</div>
+          <div class="slot-machine">
+            <div class="tag">Gacha Slot</div>
+            <div class="slot-reels">
+              <div class="reel">🌙</div>
+              <div class="reel">⭐</div>
+              <div class="reel">🔮</div>
+            </div>
+          </div>
+          <div class="lever">
+            <div class="lever-rod"></div>
+            <div class="lever-ball"></div>
+          </div>
+          <div style="height:16px"></div>
+          <div class="spin-btn">KEHANETİ ÇEVİR</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active"><span class="icon">✨</span><span class="label" style="color:#7c3aed">Fal Çek</span></div>
+          <div class="tab"><span class="icon">☕</span><span class="label">Kahve</span></div>
+          <div class="tab"><span class="icon">🏆</span><span class="label">Liderlik</span></div>
+          <div class="tab"><span class="icon">🖼️</span><span class="label">Koleksiyon</span></div>
+          <div class="tab"><span class="icon">👤</span><span class="label">Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SHOWCASE: COFFEE -->
+<div class="showcase reverse">
+  <div class="showcase-text">
+    <div class="label" style="color: #a78bfa;">Yeni Özellik</div>
+    <h2>☕ Türk Kahvesi Falı</h2>
+    <p>Fincanını çevir, fotoğrafını çek. GPT-4 Vision fincandaki desenleri analiz eder ve sana özel mistik bir yorum yapar. Ardından DALL-E yoruma göre benzersiz bir kart oluşturur.</p>
+    <p style="color: #a78bfa; font-weight: 600;">📸 Kamera veya galeri entegrasyonu</p>
+    <p style="color: #888; font-size: 14px; margin-top: 8px;">🔮 Günde 1 ücretsiz • Ek okumalar 50 GP</p>
+  </div>
+  <div class="showcase-visual">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="screen-coffee">
+          <div class="title">☕ Kahve Falı</div>
+          <div class="sub">Fincanını çevir, fotoğrafını çek,<br>kaderini oku.</div>
+          <div class="cup-area">
+            <div class="icon">☕</div>
+            <div class="text">Fincan fotoğrafı ekle</div>
+          </div>
+          <div class="coffee-btns">
+            <div class="coffee-btn cam">📷 Fotoğraf Çek</div>
+            <div class="coffee-btn gal">🖼️ Galeriden Seç</div>
+          </div>
+          <div class="read-btn">👁️ Falıma Bak</div>
+          <div class="coffee-info">🔮 Günde 1 ücretsiz okuma • Ek okumalar 50 GP</div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab"><span class="icon">✨</span><span class="label">Fal Çek</span></div>
+          <div class="tab active"><span class="icon">☕</span><span class="label" style="color:#7c3aed">Kahve</span></div>
+          <div class="tab"><span class="icon">🏆</span><span class="label">Liderlik</span></div>
+          <div class="tab"><span class="icon">🖼️</span><span class="label">Koleksiyon</span></div>
+          <div class="tab"><span class="icon">👤</span><span class="label">Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SHOWCASE: RESULT -->
+<div class="showcase">
+  <div class="showcase-text">
+    <div class="label" style="color: #fbbf24;">AI Kart Üretimi</div>
+    <h2>Eşsiz Sanat Eserleri</h2>
+    <p>Her fal çekiminde yapay zeka sana özel, tekrarlanamaz bir kart görseli oluşturur. Legendary kartlar ultra-detaylı, sinematik kalitede üretilir.</p>
+    <p style="color: #fbbf24; font-weight: 600;">✨ DALL-E 3 ile 1024x1792 dikey format</p>
+  </div>
+  <div class="showcase-visual">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="screen-result">
+          <div class="rarity-badge legendary">✨ Efsanevi</div>
+          <div class="result-title">Aşk Kapıda</div>
+          <div class="result-card-img">
+            <div class="glow"></div>
+            <div class="symbol">🌙</div>
+          </div>
+          <div class="reading-box">
+            <p>Fincanında bir kalp figürü belirmiş. Aşk hayatında güzel gelişmeler seni bekliyor. Yıldızlar romantik bir dönemin kapıda olduğunu fısıldıyor.</p>
+          </div>
+          <div class="gp-reward">
+            <span>+50 GP kazandın! 🎉</span>
+          </div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab"><span class="icon">✨</span><span class="label">Fal Çek</span></div>
+          <div class="tab active"><span class="icon">☕</span><span class="label" style="color:#7c3aed">Kahve</span></div>
+          <div class="tab"><span class="icon">🏆</span><span class="label">Liderlik</span></div>
+          <div class="tab"><span class="icon">🖼️</span><span class="label">Koleksiyon</span></div>
+          <div class="tab"><span class="icon">👤</span><span class="label">Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TECH -->
+<section class="section">
+  <div class="section-label">Teknoloji</div>
+  <h2>Modern Altyapı</h2>
+  <div class="tech-grid">
+    <div class="tech-item"><div class="tech-label">Frontend</div><div class="tech-name">React Native + Expo</div></div>
+    <div class="tech-item"><div class="tech-label">Backend</div><div class="tech-name">.NET 8 Web API</div></div>
+    <div class="tech-item"><div class="tech-label">Veritabanı</div><div class="tech-name">SQLite + EF Core</div></div>
+    <div class="tech-item"><div class="tech-label">Yapay Zeka</div><div class="tech-name">OpenAI GPT-4 + DALL-E 3</div></div>
+    <div class="tech-item"><div class="tech-label">Görüntü Analizi</div><div class="tech-name">GPT-4 Vision</div></div>
+    <div class="tech-item"><div class="tech-label">Gerçek Zamanlı</div><div class="tech-name">SignalR WebSocket</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="logo-icon" style="font-size:60px">🔮</div>
+  <h2>Kaderini Keşfet</h2>
+  <p>Fortune Gacha ile mistik dünyaya adım at.</p>
+  <a class="cta-btn" href="#">✨ Hemen Başla</a>
+</section>
+
+</body>
+</html>
